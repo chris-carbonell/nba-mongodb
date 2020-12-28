@@ -1,0 +1,52 @@
+version: '3.7'
+
+secrets:
+  mariadb:
+    file: ./secrets/mariadb
+
+services:
+
+  nba_website:
+    image: nginx:latest
+    container_name: nba_website
+    # restart: always
+    ports:
+      - "9082:80"
+    volumes:
+      - ./www/html:/usr/share/nginx/html
+    environment:
+      - TZ=${TZ}
+    depends_on:
+      - nba_db
+
+  nba_db:
+  # https://github.com/mongo-express/mongo-express-docker/issues/35#issuecomment-543788773
+    container_name: nba_db
+    image: mongo
+    env_file:
+      - ./secrets/mongo.env
+    volumes:
+      - ./db:/data/db
+    ports:
+      - 27017:27017
+
+  nba_db_admin:
+  # https://github.com/mongo-express/mongo-express-docker/issues/35#issuecomment-543788773
+    container_name: nba_db_admin
+    image: mongo-express
+    depends_on:
+      - nba_db
+    env_file:
+      - ./secrets/mongo-express.env
+    ports:
+      - 8081:8081
+
+  nba_jupyter:
+    image: nba_jupyter # see ./build/nba_jupyter
+    container_name: nba_jupyter
+    ports:
+      - 8001:8888
+    volumes:
+      - .:/home/carbo
+    depends_on:
+      - nba_db

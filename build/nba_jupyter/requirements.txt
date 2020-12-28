@@ -1,0 +1,9 @@
+# data
+pandas
+numpy
+# jupyter # specified in Dockerfile
+
+# db
+# mariadb
+pymongo
+dnspython
